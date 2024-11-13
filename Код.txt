@@ -1,0 +1,1125 @@
+public partial class Form1 : Form
+{
+    public Form1()
+    {
+        InitializeComponent();
+    }
+    DataBase db = new DataBase();
+    string PassC = "";
+    string LoginC = "";
+
+    private void Vhod_Click(object sender, EventArgs e)
+    {
+        if (AdminCheck.Checked == true)
+        {
+            DataBase.bc = "";
+            LoginC = loginBox.Text;
+            PassC = passBox.Text;
+            DataBase.Login = LoginC;
+            LoginC = loginBox.Text;
+            PassC = passBox.Text;
+            DataBase.Login = LoginC;
+            if (LoginC == "" || PassC == "")
+            {
+                MessageBox.Show("Пожалуйста введите логин/пароль", "Ошибка",
+                MessageBoxButtons.OK, MessageBoxIcon.Exclamation); return;
+            }
+            SqlDataAdapter adapter = new SqlDataAdapter();
+            DataTable table = new DataTable();
+            string query = $"select login, password from Profiles where login='{LoginC}'and password='{PassC}' and admin='{1}'";
+            SqlCommand command = new SqlCommand(query, db.getConnection());
+            adapter.SelectCommand = command;
+            adapter.Fill(table);
+            if (table.Rows.Count == 1)
+            {
+                MessageBox.Show("Вы успешно вошли!", "Успешно",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                AdminProf ap = new AdminProf();
+                ap.Show();
+                this.Hide();
+            }
+            else
+            {
+                MessageBox.Show("Неверный логин/пароль", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+        }
+        else
+        {
+            LoginC = loginBox.Text;
+            PassC = passBox.Text;
+            DataBase.Login = LoginC;
+            if (LoginC == "" || PassC == "")
+            {
+                MessageBox.Show("Пожалуйста введите логин/пароль", "Ошибка",
+                MessageBoxButtons.OK, MessageBoxIcon.Exclamation); return;
+            }
+            SqlDataAdapter adapter = new SqlDataAdapter();
+            DataTable table = new DataTable();
+            string query = $"select login, password from Profiles where login='{LoginC}'and password='{PassC}'";
+            SqlCommand command = new SqlCommand(query, db.getConnection());
+            adapter.SelectCommand = command;
+            adapter.Fill(table);
+            if (table.Rows.Count == 1)
+            {
+                MessageBox.Show("Вы успешно вошли!", "Успешно",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                ReaderProf rp = new ReaderProf();
+                rp.Show();
+                this.Hide();
+
+            }
+            else
+            {
+                MessageBox.Show("Неверный логин/пароль", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }              
+        }
+    }
+
+    private void Reg_Click(object sender, EventArgs e)
+    {
+        Reg r = new Reg();
+        r.Show();
+        this.Hide();
+ 
+    }
+
+    private void exit_Click(object sender, EventArgs e)
+    {
+        System.Diagnostics.Process.GetCurrentProcess().Kill();
+    }
+
+    private void Form1_Load(object sender, EventArgs e)
+    {
+        passBox.UseSystemPasswordChar = true;
+        PasVis.Visible = false;
+        PasVis.Enabled = false;
+    }
+
+    private void PasNoVis_Click(object sender, EventArgs e)
+    {
+        passBox.UseSystemPasswordChar = false;
+        PasVis.Visible = true;
+        PasNoVis.Visible = false;
+        PasVis.Enabled = true;
+        PasNoVis.Enabled = false;
+    }
+
+    private void PasVis_Click(object sender, EventArgs e)
+    {
+        passBox.UseSystemPasswordChar = true;
+        PasVis.Visible = false;
+        PasNoVis.Visible = true;
+        PasNoVis.Enabled = true;
+        PasVis.Enabled = false;
+    }
+}
+
+public partial class Reg : Form
+{
+    public Reg()
+    {
+        InitializeComponent();
+    }
+    DataBase db = new DataBase();
+    string PassC = "";
+    string LoginC = "";
+    string mail = "";
+    private void Back_Click(object sender, EventArgs e)
+    {
+        Form1 f1 = new Form1();
+        this.Hide();
+        f1.Show();
+    }
+
+    private void Regi_Click(object sender, EventArgs e)
+    {
+        if (RegPass1.Text == RegPass2.Text)
+        {
+            LoginC = RegLog.Text;
+            PassC = RegPass1.Text;
+            mail = RegMail.Text;
+            DataBase.Login = LoginC;
+            if (LoginC == "" || PassC == "")
+            {
+                MessageBox.Show("Пожалуйста введите логин/пароль", "Ошибка",
+                MessageBoxButtons.OK, MessageBoxIcon.Exclamation); return;
+            }
+            SqlDataAdapter adapter = new SqlDataAdapter();
+            DataTable table = new DataTable();
+            string query = $"select login from Profiles where login='{LoginC}'";
+            SqlCommand cmd = new SqlCommand(query, db.getConnection());
+            adapter.SelectCommand = cmd;
+            adapter.Fill(table);
+            db.openConnection();
+            if (table.Rows.Count == 0)
+            {
+                SqlCommand insert = new SqlCommand($"insert into Profiles (login,mail, password, admin) values ('{LoginC}','{mail}','{PassC}','{0}')", db.getConnection());
+                if (insert.ExecuteNonQuery() == 1) 
+                    MessageBox.Show("Регистрация прошла успешно!", "Успешно",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Form1 f1 = new Form1();
+                f1.Show();
+                this.Hide();
+            }
+            else
+            {
+                MessageBox.Show("Такой логин уже существует");
+            }
+            db.closeConnection();
+
+        }
+        else
+            MessageBox.Show("Пароли не совпадают!");
+    }
+
+    private void Reg_Load(object sender, EventArgs e)
+    {
+        RegPass1.UseSystemPasswordChar = true;
+        RegPass2.UseSystemPasswordChar = true;
+        PasVis.Visible = false;
+        PasVis.Enabled = false;
+        PasVis2.Visible = false;
+        PasVis2.Enabled = false;
+    }
+
+    private void PasVis_Click(object sender, EventArgs e)
+    {
+        RegPass1.UseSystemPasswordChar = true;
+        PasVis.Visible = false;
+        PasNoVis.Visible = true;
+        PasNoVis.Enabled = true;
+        PasVis.Enabled = false;
+    }
+
+    private void PasNoVis_Click(object sender, EventArgs e)
+    {
+        RegPass1.UseSystemPasswordChar = false;
+        PasVis.Visible = true;
+        PasNoVis.Visible = false;
+        PasVis.Enabled = true;
+        PasNoVis.Enabled = false;
+    }
+
+    private void PasVis2_Click(object sender, EventArgs e)
+    {
+        RegPass2.UseSystemPasswordChar = true;
+        PasVis2.Visible = false;
+        PasNoVis2.Visible = true;
+        PasNoVis2.Enabled = true;
+        PasVis2.Enabled = false;
+
+    }
+
+    private void PasNoVis2_Click(object sender, EventArgs e)
+    {
+        RegPass2.UseSystemPasswordChar = false;
+        PasVis2.Visible = true;
+        PasNoVis2.Visible = false;
+        PasVis2.Enabled = true;
+        PasNoVis2.Enabled = false;
+    }
+}
+
+internal class DataBase
+{
+    SqlConnection SqlConnection = new SqlConnection(@"Data Source=DESKTOP-9U53OVR;Initial Catalog=Biba;Integrated Security=True;Encrypt=False");
+    public void openConnection()
+    {
+        if (SqlConnection.State == System.Data.ConnectionState.Closed)
+        {
+            SqlConnection.Open();
+        }
+    }
+    public void closeConnection()
+    {
+        if (SqlConnection.State == System.Data.ConnectionState.Open)
+        {
+            SqlConnection.Close();
+        }
+    }
+    public SqlConnection getConnection()
+    {
+        return SqlConnection;
+    }
+    public static string Login;
+    public static int tc = 0;
+    public static string bc="";
+}
+
+enum RowState
+{
+    Existed,
+    New,
+    Modified,
+    ModifiedNew,
+    Deleted
+}
+public partial class ReaderProf : Form
+{
+    DataBase database = new DataBase();
+    public ReaderProf()
+    {
+        InitializeComponent();
+    }
+    public class Book
+    {
+        public byte[] CoverImage { get; set; }
+        public string Title { get; set; }
+        
+    }
+    private void LoadData()
+    {
+        List<Book> books = new List<Book>();
+
+        try
+        {
+            database.openConnection();
+
+            using (SqlCommand command = new SqlCommand("SELECT image, name FROM Books", database.getConnection()))
+            {
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Book book = new Book
+                        {
+                            CoverImage = reader["image"] as byte[],
+                            Title = reader.GetString(1)                             
+                        };
+
+                        books.Add(book);
+                    }
+                }
+            }
+
+            var bindingList = new BindingList<Book>(books);
+            var source = new BindingSource(bindingList, null);
+
+            catalogGrid.DataSource = source;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Error: " + ex.Message);
+        }
+        finally
+        {
+            database.closeConnection();
+        }
+    }
+    private void Back_Click(object sender, EventArgs e)
+    {
+    }
+
+    private void BackToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        Form1 form1 = new Form1();
+        form1.Show();
+        this.Hide();          
+    }
+
+    private void ProfToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        Profile pf = new Profile();
+        pf.Show();
+        this.Hide();
+    }
+
+    private void ReaderProf_Load(object sender, EventArgs e)
+    {
+        LoadData();
+    }
+
+    private void CatalogGrid_CellContentClick(object sender, DataGridViewCellEventArgs e)
+    {
+        var cellValue = catalogGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+        string cv = cellValue.ToString();
+        DataBase.bc = cv;
+        BookInfo bookInfo = new BookInfo();
+        bookInfo.Show();
+        this.Hide();
+    }
+
+    private void search_Click(object sender, EventArgs e)
+    {
+        if (comboBoxGenre.Text == "")
+        {
+            List<Book> books = new List<Book>();
+            try
+            {
+                database.openConnection();
+
+                using (SqlCommand command = new SqlCommand($"SELECT image, name FROM Books where name like '%" +textBoxSearch.Text+"%'", database.getConnection()))
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Book book = new Book
+                            {
+                                CoverImage = reader["image"] as byte[],
+                                Title = reader.GetString(1)
+                            };
+
+                            books.Add(book);
+                        }
+                    }
+                }
+
+                var bindingList = new BindingList<Book>(books);
+                var source = new BindingSource(bindingList, null);
+
+                catalogGrid.DataSource = source;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+            finally
+            {
+                database.closeConnection();
+            }
+        }
+        else
+        {
+            List<Book> books = new List<Book>();
+
+            try
+            {
+                database.openConnection();
+
+                using (SqlCommand command = new SqlCommand($"SELECT image, name FROM Books where name like '%" +textBoxSearch.Text+"%' and genre like '%"+comboBoxGenre.Text+"%'", database.getConnection()))
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Book book = new Book
+                            {
+                                CoverImage = reader["image"] as byte[],
+                                Title = reader.GetString(1)
+                            };
+
+                            books.Add(book);
+                        }
+                    }
+                }
+
+                var bindingList = new BindingList<Book>(books);
+                var source = new BindingSource(bindingList, null);
+
+                catalogGrid.DataSource = source;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+            finally
+            {
+                database.closeConnection();
+            }
+        }
+    }        
+}
+
+ public partial class BookInfo : Form
+ {
+     public BookInfo()
+     {
+         InitializeComponent();
+     }
+     DataBase db = new DataBase();
+     string cv = DataBase.bc;
+     private void LoadImageFromDatabase()
+     {
+         try
+         {
+             db.openConnection();
+             string name = DataBase.bc;
+             using (SqlCommand command = new SqlCommand("SELECT image FROM Books WHERE name = @Name", db.getConnection()))
+             {
+                 command.Parameters.AddWithValue("@Name", name);
+                 byte[] imageData = command.ExecuteScalar() as byte[];
+
+                 if (imageData != null)
+                 {
+                     using (MemoryStream ms = new MemoryStream(imageData))
+                     {
+                         pictureBox1.Image = Image.FromStream(ms);
+                     }
+                 }
+                 else
+                 {
+                     MessageBox.Show("Image not found for the specified book ID.");
+                 }
+             }
+         }
+         catch (Exception ex)
+         {
+             MessageBox.Show("Error: " + ex.Message);
+         }
+         finally
+         {
+             db.closeConnection();
+         }
+     }
+     private void BookInfo_Load(object sender, EventArgs e)
+     {
+         LoadImageFromDatabase();
+         SqlDataAdapter adapter1 = new SqlDataAdapter();
+         DataTable table1 = new DataTable();
+         string query1 = $"select name, login from Favorite where name = '{DataBase.bc}' and login = '{DataBase.Login}'";
+         SqlCommand cmd1 = new SqlCommand(query1, db.getConnection());
+         adapter1.SelectCommand = cmd1;
+         adapter1.Fill(table1);
+         db.openConnection();
+         if (table1.Rows.Count == 1)
+         {
+             unfav.Visible = true;
+             fav.Visible = false;
+         }
+         db.closeConnection();
+
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"select name, author, info, genre from Books where name='{cv}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         try
+         {
+             db.openConnection();
+             SqlDataReader reader = cmd.ExecuteReader();
+             if (reader.Read())
+             {
+                 labelName.Text += reader[0].ToString();
+                 labelAuthor.Text += reader[1].ToString();
+                 labelDis.Text += reader[2].ToString();
+                 labelGenre.Text += reader[3].ToString();
+             }
+             else
+             {
+                 MessageBox.Show("Данные не найдены.");
+             }
+             reader.Close();
+         }
+         catch (Exception ex)
+         {
+             MessageBox.Show("Ошибка: " + ex.Message);
+         }
+         adapter.SelectCommand = cmd;
+         adapter.Fill(table);
+     }
+
+     private void Read_Click(object sender, EventArgs e)
+     {
+         DataBase.tc = 0;
+         ReadBook rb = new ReadBook();
+         rb.Show();
+         this.Hide();
+     }
+
+     private void MainToolStripMenuItem_Click(object sender, EventArgs e)
+     {
+         ReaderProf rp = new ReaderProf();
+         rp.Show();
+         this.Hide();
+     }
+
+     private void ПрофильToolStripMenuItem_Click(object sender, EventArgs e)
+     {
+         Profile p = new Profile();
+         p.Show();
+         this.Hide();
+     }
+
+     private void BackToolStripMenuItem_Click(object sender, EventArgs e)
+     {
+         ReaderProf rp = new ReaderProf();
+         rp.Show();
+         this.Hide();
+     }
+
+     private void Fav_Click(object sender, EventArgs e)
+     {
+         string connectionString = "Data Source=DESKTOP-9U53OVR;Initial Catalog=Biba;Integrated Security=True;Encrypt=False";
+         unfav.Visible = true;
+         fav.Visible = false;
+
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"select name, login from Favorite where name = '{DataBase.bc}' and login = '{DataBase.Login}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         adapter.SelectCommand = cmd;
+         adapter.Fill(table);
+         db.openConnection();
+         if (table.Rows.Count == 0)
+         {
+             SqlCommand insert = new SqlCommand($"insert into Favorite (name,login,favorite) values ('{DataBase.bc}','{DataBase.Login}','{1}')", db.getConnection());
+             if (insert.ExecuteNonQuery() == 1) { }
+         }         
+         db.openConnection();
+         string name = DataBase.bc;
+         using (SqlCommand command = new SqlCommand("SELECT image FROM Books WHERE name = @Name", db.getConnection()))
+         {
+             command.Parameters.AddWithValue("@Name", name);
+             byte[] imageData = command.ExecuteScalar() as byte[];
+
+             if (imageData != null)
+             {
+                 using (MemoryStream ms = new MemoryStream(imageData))
+                 {
+                     pictureBox1.Image = Image.FromStream(ms);
+                 }
+             }
+         }
+         using (SqlConnection connection = new SqlConnection(connectionString))
+         {
+             db.openConnection();
+             string nam = DataBase.bc;
+             using (SqlCommand command = new SqlCommand("SELECT image FROM Books WHERE name = @Name", db.getConnection()))
+             {
+                 command.Parameters.AddWithValue("@Name", nam);
+                 byte[] imageData = command.ExecuteScalar() as byte[];
+
+                 if (imageData != null)
+                 {
+                     using (MemoryStream ms = new MemoryStream(imageData))
+                     {
+                         connection.Open();
+                         string sql = "update Favorite set image = @ImageData where name=@Name and login=@Login";
+                         using (SqlCommand cmnd = new SqlCommand(sql, connection))
+                         {
+                             cmnd.Parameters.AddWithValue("@ImageData", imageData);
+                             cmnd.Parameters.AddWithValue("@Name", DataBase.bc);
+                             cmnd.Parameters.AddWithValue("@Login", DataBase.Login);
+                             cmnd.ExecuteNonQuery();
+                         }
+                     }
+                 }
+             }
+         }
+         db.closeConnection();
+     }
+
+     private void Unfav_Click(object sender, EventArgs e)
+     {
+         fav.Visible = true;
+         unfav.Visible = false;
+         string unname = DataBase.bc;
+         string unlog = DataBase.Login;
+             string connectionString = "Data Source=DESKTOP-9U53OVR;Initial Catalog=Biba;Integrated Security=True;Encrypt=False";           
+             using (SqlConnection connection = new SqlConnection(connectionString))
+             {
+                 connection.Open();               
+             string sql = "delete from Favorite where name=@Name and login=@Login";
+             using (SqlCommand command = new SqlCommand(sql, connection))
+                 {
+                     command.Parameters.AddWithValue("@Name", unname);
+                     command.Parameters.AddWithValue("@Login", unlog);
+                     command.ExecuteNonQuery();
+                 }
+             }
+     }
+ }
+
+ public partial class ReadBook : Form
+ {
+     public ReadBook()
+     {
+         InitializeComponent();
+     }
+     DataBase db = new DataBase();
+     private void mainToolStripMenuItem_Click(object sender, EventArgs e)
+     {
+         ReaderProf readerProf = new ReaderProf();
+         readerProf.Show();
+         this.Hide();
+     }
+     string cv=DataBase.bc;
+     private void ReadBook_Load(object sender, EventArgs e)
+     {
+         if (DataBase.tc == 1)
+         {
+             text.Cursor = Cursors.IBeam;
+             save.Visible = true;
+             text.ReadOnly = false;
+             back.Visible = true;
+             menuStrip1.Visible = false;
+         }
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string query = $"select text from Books where name='{cv}'";
+         SqlCommand cmd = new SqlCommand(query, db.getConnection());
+         try
+         {
+             db.openConnection();
+             SqlDataReader reader = cmd.ExecuteReader();
+             if (reader.Read())
+             {
+                 text.Text = reader[0].ToString();
+             }
+             else
+             {
+                 MessageBox.Show("Данные не найдены.");
+             }
+             reader.Close();
+         }
+         catch (Exception ex)
+         {
+             MessageBox.Show("Ошибка: " + ex.Message);
+         }
+         adapter.SelectCommand = cmd;
+         adapter.Fill(table);
+     }
+
+     private void Save_Click(object sender, EventArgs e)
+     {
+         SqlDataAdapter adapter = new SqlDataAdapter();
+         DataTable table = new DataTable();
+         string command = ($"update Books set text='{text.Text}' where name='{cv}' ");
+         SqlCommand update = new SqlCommand(command, db.getConnection());
+         adapter.SelectCommand = update;
+         adapter.Fill(table);
+         if (update.ExecuteNonQuery() == 1)
+             MessageBox.Show("Текст изменён!", "Успех",
+                 MessageBoxButtons.OK, MessageBoxIcon.Information);
+         else
+             MessageBox.Show("Текст не изменен!", "Неудача",
+                 MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+     }
+
+     private void ПрофильToolStripMenuItem_Click(object sender, EventArgs e)
+     {
+         Profile p = new Profile();
+         p.Show();
+         this.Hide();
+     }
+
+     private void BackToolStripMenuItem_Click(object sender, EventArgs e)
+     {
+         BookInfo bi = new BookInfo();
+         bi.Show();
+         this.Hide();
+     }
+
+     private void Back_Click(object sender, EventArgs e)
+     {
+         BookChange bc = new BookChange();
+         bc.Show();
+         this.Hide();
+     }
+ }
+
+ public partial class Profile : Form
+ {
+     public Profile()
+     {
+         InitializeComponent();
+     }
+     DataBase database = new DataBase();
+     private void LoadData()
+     {
+         List<Book> books = new List<Book>();
+
+         try
+         {
+             database.openConnection();
+
+             using (SqlCommand command = new SqlCommand($"SELECT image, name FROM Favorite where login = '{DataBase.Login}'", database.getConnection()))
+             {
+                 using (SqlDataReader reader = command.ExecuteReader())
+                 {
+                     while (reader.Read())
+                     {
+                         Book book = new Book
+                         {
+                             CoverImage = reader["image"] as byte[],
+                             Title = reader.GetString(1)
+                         };
+
+                         books.Add(book);
+                     }
+                 }
+             }
+
+             var bindingList = new BindingList<Book>(books);
+             var source = new BindingSource(bindingList, null);
+
+             favGrid.DataSource = source;
+         }
+         catch (Exception ex)
+         {
+             MessageBox.Show("Error: " + ex.Message);
+         }
+         finally
+         {
+             database.closeConnection();
+         }
+     }
+     private void MainToolStripMenuItem_Click(object sender, EventArgs e)
+     {
+         ReaderProf rp = new ReaderProf();
+         rp.Show();
+         this.Hide();        
+     }
+
+     private void BackToolStripMenuItem_Click(object sender, EventArgs e)
+     {
+         Form1 f1 = new Form1();
+         f1.Show();
+         this.Hide();
+     }
+
+     private void Profile_Load(object sender, EventArgs e)
+     {
+         label2.Text += DataBase.Login;
+         LoadData();
+     }
+
+     private void favGrid_CellContentClick(object sender, DataGridViewCellEventArgs e)
+     {
+         var cellValue = favGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+         string cv = cellValue.ToString();
+         DataBase.bc = cv;
+         BookInfo bookInfo = new BookInfo();
+         bookInfo.Show();
+         this.Hide();
+     }
+ }
+
+public partial class AdminProf : Form
+{
+    public AdminProf()
+    {
+        InitializeComponent();
+    }
+    DataBase database = new DataBase();
+    private void LoadData()
+    {
+        List<Book> books = new List<Book>();
+
+        try
+        {
+            database.openConnection();
+
+            using (SqlCommand command = new SqlCommand("SELECT image, name FROM Books", database.getConnection()))
+            {
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Book book = new Book
+                        {
+                            CoverImage = reader["image"] as byte[],
+                            Title = reader.GetString(1)
+                        };
+
+                        books.Add(book);
+                    }
+                }
+            }
+
+            var bindingList = new BindingList<Book>(books);
+            var source = new BindingSource(bindingList, null);
+
+            catalogGrid.DataSource = source;             
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Error: " + ex.Message);
+        }
+        finally
+        {
+            database.closeConnection();
+        }
+    }
+    private void Back_Click(object sender, EventArgs e)
+    {
+        Form1 form1 = new Form1();
+        this.Hide();
+        form1.Show();
+    }
+
+    private void newbook_Click(object sender, EventArgs e)
+    {
+        DataBase.bc = "";
+        BookChange bookChange = new BookChange();
+        bookChange.Show();
+        this.Hide();
+    }
+
+    private void AdminProf_Load(object sender, EventArgs e)
+    {
+        LoadData();
+    }
+
+    private void catalogGrid_CellContentClick(object sender, DataGridViewCellEventArgs e)
+    {
+        var cellValue = catalogGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+        string cv = cellValue.ToString();
+        DataBase.bc = cv;
+        BookChange bookChange = new BookChange();
+        bookChange.Show();
+        this.Hide();
+    }
+
+    private void search_Click(object sender, EventArgs e)
+    {
+        List<Book> books = new List<Book>();
+
+        try
+        {
+            database.openConnection();
+
+            using (SqlCommand command = new SqlCommand($"SELECT image, name FROM Books where name like '%" + textBoxSearch.Text + "%'", database.getConnection()))
+            {
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Book book = new Book
+                        {
+                            CoverImage = reader["image"] as byte[],
+                            Title = reader.GetString(1)
+                        };
+
+                        books.Add(book);
+                    }
+                }
+            }
+
+            var bindingList = new BindingList<Book>(books);
+            var source = new BindingSource(bindingList, null);
+
+            catalogGrid.DataSource = source;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Error: " + ex.Message);
+        }
+        finally
+        {
+            database.closeConnection();
+        }
+    }
+}
+
+ public partial class BookChange : Form
+ {
+     DataBase db =new DataBase();
+     private void LoadImageFromDatabase()
+     {
+         try
+         {
+             db.openConnection();
+             string name = DataBase.bc;
+             using (SqlCommand command = new SqlCommand("SELECT image FROM Books WHERE name = @Name", db.getConnection()))
+             {
+                 command.Parameters.AddWithValue("@Name", name);
+                 byte[] imageData = command.ExecuteScalar() as byte[];
+
+                 if (imageData != null)
+                 {
+                     using (MemoryStream ms = new MemoryStream(imageData))
+                     {
+                         pictureBox1.Image = Image.FromStream(ms);
+                     }
+                 }
+                 else
+                 {
+                     MessageBox.Show("Image not found for the specified book ID.");
+                 }
+             }
+         }
+         catch (Exception ex)
+         {
+             MessageBox.Show("Error: " + ex.Message);
+         }
+         finally
+         {
+             db.closeConnection();
+         }
+     }
+     public BookChange()
+     {
+         InitializeComponent();
+         pictureBox1.AllowDrop = true;
+         pictureBox1.DragEnter += PictureBox1_DragEnter;
+         pictureBox1.DragDrop += PictureBox1_DragDrop;
+     }
+     private void PictureBox1_DragEnter(object sender, DragEventArgs e)
+     {
+         if (e.Data.GetDataPresent(DataFormats.FileDrop))
+         {
+             e.Effect = DragDropEffects.Copy;
+         }
+     }
+     private void PictureBox1_DragDrop(object sender, DragEventArgs e)
+     {
+         string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+         if (files.Length > 0)
+         {
+             string filePath = files[0];
+             pictureBox1.Image = Image.FromFile(filePath);
+             pictureBox1.Tag = filePath;
+         }
+     }
+     string cv;
+     private void btnSave_Click(object sender, EventArgs e)
+     {
+
+         cv = DataBase.bc;
+         if (cv != "")
+         {
+             if (pictureBox1.Image != null && pictureBox1.Tag != null || cv!="" || textBoxAuthor.Text!="" || comboBoxGenre.Text!="" || textBoxDis.Text!="")
+             {
+                 string connectionString = "Data Source=DESKTOP-9U53OVR;Initial Catalog=Biba;Integrated Security=True;Encrypt=False";                   
+                 string filePath = pictureBox1.Tag.ToString();
+                 byte[] imageData = File.ReadAllBytes(filePath);
+                 using (SqlConnection connection = new SqlConnection(connectionString))
+                 {
+                     connection.Open();
+                     string sql = "update Books set image = @ImageData, name = @Rename, author = @Author, info = @Discription, genre = @Genre where name=@Name ";
+                     using (SqlCommand command = new SqlCommand(sql, connection))
+                     {
+                         command.Parameters.AddWithValue("@ImageData", imageData);
+                         command.Parameters.AddWithValue("@Name", cv);
+                         command.Parameters.AddWithValue("@Rename", textBoxName.Text);
+                         command.Parameters.AddWithValue("@Author", textBoxAuthor.Text);
+                         command.Parameters.AddWithValue("@Genre", comboBoxGenre.Text);
+                         command.Parameters.AddWithValue("@Discription", textBoxDis.Text);
+                         command.ExecuteNonQuery();
+                     }
+                 }
+                 MessageBox.Show("Описание изменено.");
+             }
+             else
+             {
+                 MessageBox.Show("Ошибка.");
+             }
+         }
+         else
+         {
+             DataBase.bc = textBoxName.Text;
+             if (pictureBox1.Image != null && pictureBox1.Tag != null && textBoxName.Text != "" && textBoxAuthor.Text != "" && comboBoxGenre.Text != "" && textBoxDis.Text != "")
+             {
+                 string connectionString = @"Data Source=510-013;Initial Catalog=Biba;Integrated Security=True;Encrypt=False";
+                 string filePath = pictureBox1.Tag.ToString();
+                 byte[] imageData = File.ReadAllBytes(filePath);
+                 SqlDataAdapter adapter = new SqlDataAdapter();
+                 DataTable table = new DataTable();
+                 string query = $"select name from Books where name='{textBoxName}'";
+                 SqlCommand cmd = new SqlCommand(query, db.getConnection());
+                 adapter.SelectCommand = cmd;
+                 adapter.Fill(table);
+                 db.openConnection();
+                 if (table.Rows.Count == 0)
+                 {
+                     SqlCommand insert = new SqlCommand($"insert into Books (name, author, info, genre) values ('{textBoxName.Text}','{textBoxAuthor.Text}','{textBoxDis.Text}', '{comboBoxGenre.Text}')", db.getConnection());
+                     if (insert.ExecuteNonQuery() == 1) { MessageBox.Show("Описание сохранено."); }
+                 }
+                 else
+                 {
+                     MessageBox.Show("Такая книга уже существует");
+                 }
+                 using (SqlConnection connection = new SqlConnection(connectionString))
+                 {
+                     connection.Open();
+                     string sql = "update Books set image = @ImageData where name=@Name ";
+                     using (SqlCommand command = new SqlCommand(sql, connection))
+                     {
+                         command.Parameters.AddWithValue("@ImageData", imageData);
+                         command.Parameters.AddWithValue("@Name", textBoxName.Text);
+                         command.ExecuteNonQuery();
+                     }
+                 }
+                 db.closeConnection();
+             }
+             else
+             {
+                 MessageBox.Show("Ошибка.");
+             }
+         }
+     }
+     private void BookChange_Load(object sender, EventArgs e)
+     {
+         cv=DataBase.bc;
+         if (cv == "")
+         {
+             btnSave.Text = "Сохранить";
+             textChange.Text = "Ввести текст";
+         }
+         else
+         {
+             LoadImageFromDatabase();
+             SqlDataAdapter adapter = new SqlDataAdapter();
+             DataTable table = new DataTable();
+             string query = $"select name, author, info, genre from Books where name='{cv}'";
+             SqlCommand cmd = new SqlCommand(query, db.getConnection());
+             try
+             {
+                 db.openConnection();
+                 SqlDataReader reader = cmd.ExecuteReader();
+                 if (reader.Read())
+                 {
+                     textBoxName.Text = reader[0].ToString();
+                     textBoxAuthor.Text = reader[1].ToString();
+                     textBoxDis.Text = reader[2].ToString();
+                     comboBoxGenre.Text = reader[3].ToString();
+                 }
+                 else
+                 {
+                     MessageBox.Show("Данные не найдены.");
+                 }
+                 reader.Close();
+             }
+             catch (Exception ex)
+             {
+                 MessageBox.Show("Ошибка: " + ex.Message);
+             }
+             adapter.SelectCommand = cmd;
+             adapter.Fill(table);
+         }
+     }
+     private void TextChange_Click(object sender, EventArgs e)
+     {
+         DataBase.tc = 1;
+         ReadBook rb = new ReadBook();
+         rb.Show();
+         this.Hide();
+     }
+
+     private void PictureBox1_DoubleClick(object sender, EventArgs e)
+     {
+         OpenFileDialog openFileDialog = new OpenFileDialog();
+         openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.png, *.bmp)|*.jpg;*.jpeg;*.png;*.bmp";
+         if (openFileDialog.ShowDialog() == DialogResult.OK)
+         {
+             Image img1 = Image.FromFile(openFileDialog.FileName);
+             Image img2 = pictureBox1.Image;
+             if (img2 != null)
+             {
+                 Bitmap bmp = new Bitmap(img2.Width, img2.Height);
+                 using (Graphics g = Graphics.FromImage(bmp))
+                 {
+                     g.DrawImage(img2, 0, 0);
+                     g.DrawImage(img1, 0, 0);
+                 }
+                 pictureBox1.Image = bmp;
+             }
+             else
+             {
+                 pictureBox1.Image = img1;
+             }
+         }
+     }
+
+     private void Back_Click(object sender, EventArgs e)
+     {
+         AdminProf ap = new AdminProf();
+         ap.Show();
+         this.Hide();
+     }
+ }
